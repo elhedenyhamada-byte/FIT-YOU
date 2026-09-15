@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FT-HiiT - نظام إدارة اللياقة</title>
+    <style>
+        :root {
+            --primary: #ff5722;
+            --primary-dark: #e64a19;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --card-bg: #1e1e1e;
+            --text-light: #f5f5f5;
+            --text-gray: #b0b0b0;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 8px rgba(255, 87, 34, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .main-header h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .admin-tabs, .trainer-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-right: 4px solid var(--primary);
+        }
+
+        .stat-card h3 {
+            color: var(--text-gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .sessions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .session-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .session-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .session-card p {
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #333;
+        }
+
+        .data-table th {
+            background: #252525;
+            color: var(--primary);
+        }
+
+        .data-table tr:hover {
+            background: #222;
+        }
+
+        .inline-input {
+            padding: 6px 10px;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 5px;
+            width: 90px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+
+        .section-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .section-box h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .filter-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        #notification-banner {
+            background: linear-gradient(135deg, #e64a19, #ff5722);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-item {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-right: 4px solid var(--primary);
+        }
+
+        .notification-item .time {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 5px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            border-top: 4px solid var(--primary);
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: bold;
+            gap: 15px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>جاري الاتصال بقاعدة البيانات السحابية وجلب البيانات...</div>
+    </div>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>FT-HiiT Login</h2>
+            <div class="form-group">
+                <label>اختر المستخدم:</label>
+                <select id="login-user-select" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>الرقم السري:</label>
+                <input type="password" id="login-pass" class="form-control" placeholder="أدخل الرقم السري واضغط Enter">
+            </div>
+            <button class="btn" onclick="handleLogin()">تسجيل الدخول</button>
+        </div>
+    </div>
+
+    <div id="app-screen" class="app-container hidden">
+        <header class="main-header">
+            <h1 id="app-title">FT-HiiT Fitness</h1>
+            <div class="user-info">
+                <span id="welcome-msg">مرحباً، المستخدم</span>
+                <button class="logout-btn" onclick="handleLogout()">تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <div id="admin-view-1" class="admin-section hidden">
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAdminTab(1)">إحصائيات المدربين والتارجت</button>
+                <button class="tab-btn" onclick="switchAdminTab(2)">سجل الجلسات والتسجيلات</button>
+                <button class="tab-btn" onclick="switchAdminTab(3)">إدارة الحسابات والأمان</button>
+            </div>
+
+            <div class="section-box">
+                <h3>متابعة أداء المدربين والمقارنات (تعديل التارجت والمحقق)</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم المدرب</th>
+                                <th>المسمى الوظيفي</th>
+                                <th>التارجت (ساعات)</th>
+                                <th>المتبقي (ساعات)</th>
+                                <th>المحقق شهرياً (دقائق)</th>
+                                <th>النسبة اليومية/الشهرية</th>
+                                <th>التسجيل وإرسال الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-stats-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-view-3" class="admin-section hidden">
+            <div class="admin-tabs">
+                <button class="tab-btn" onclick="switchAdminTab(1)">إحصائيات المدربين والتارجت</button>
+                <button class="tab-btn active" onclick="switchAdminTab(2)">سجل الجلسات والتسجيلات</button>
+                <button class="tab-btn" onclick="switchAdminTab(3)">إدارة الحسابات والأمان</button>
+            </div>
+
+            <div class="section-box">
+                <h3>تقرير سجل التسجيل اليومي وأوقات الجلسات (من سحابة إكسل)</h3>
+                <div class="filter-container">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>اختر المدرب:</label>
+                        <select id="filter-user" class="form-control">
+                            <option value="all">جميع المدربين</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>من تاريخ:</label>
+                        <input type="date" id="filter-from" class="form-control">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>إلى تاريخ:</label>
+                        <input type="date" id="filter-to" class="form-control">
+                    </div>
+                    <button class="btn" style="height: 47px;" onclick="filterLogs()">عرض التقرير</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم المدرب</th>
+                                <th>نوع الجلسة</th>
+                                <th>المقدار المخصوم</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>توقيت التسجيل</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-logs-table-body">
+                            <tr><td colspan="5" style="text-align: center;">الرجاء اختيار الفترة والضغط على عرض التقرير</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-view-2" class="admin-section hidden">
+            <div class="admin-tabs">
+                <button class="tab-btn" onclick="switchAdminTab(1)">إحصائيات المدربين والتارجت</button>
+                <button class="tab-btn" onclick="switchAdminTab(2)">سجل الجلسات والتسجيلات</button>
+                <button class="tab-btn active" onclick="switchAdminTab(3)">إدارة الحسابات والأمان</button>
+            </div>
+
+            <div class="section-box">
+                <h3>تغيير الرقم السري لمدير اللياقة (Admin)</h3>
+                <div style="display: flex; gap: 15px; max-width: 500px;">
+                    <input type="password" id="new-admin-pass" class="form-control" placeholder="الرقم السري الجديد">
+                    <button class="btn" style="width: auto; padding: 0 25px;" onclick="updateAdminPassword()">حفظ</button>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <h3>إضافة مدرب جديد</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <input type="text" id="new-user-name" class="form-control" placeholder="اسم المدرب">
+                    <input type="text" id="new-user-role" class="form-control" placeholder="المسمى الوظيفي">
+                    <input type="password" id="new-user-pass" class="form-control" placeholder="الرقم السري">
+                    <input type="number" id="new-user-target-hours" class="form-control" placeholder="التارجت (بالساعات)">
+                </div>
+                <button class="btn" style="max-width: 200px;" onclick="addNewUser()">إضافة المدرب</button>
+            </div>
+
+            <div class="section-box">
+                <h3>إدارة حسابات المدربين (الأمان والحذف)</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم المدرب</th>
+                                <th>المسمى الوظيفي</th>
+                                <th>تغيير الرقم السري</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-manage-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="trainer-view" class="hidden">
+            <div id="notification-banner" class="hidden" onclick="goToNotesTab()">
+                <span>🔔 لديك ملاحظة جديدة من مدير اللياقة! (اضغط هنا للعرض)</span>
+                <span style="font-size: 12px; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;">إغلاق وتوجه</span>
+            </div>
+
+            <div class="trainer-tabs">
+                <button class="tab-btn active" id="btn-tab-dash" onclick="switchTrainerTab('dash')">لوحة التحكم وجلسات التمارين</button>
+                <button class="tab-btn" id="btn-tab-notes" onclick="switchTrainerTab('notes')">صفحة الملاحظات (<span id="notes-badge">0</span>)</button>
+            </div>
+
+            <div id="trainer-dash-content">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>التارجت المستهدف الإجمالي</h3>
+                        <div class="value" id="t-target">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>الرقم المتبقي من التارجت</h3>
+                        <div class="value" id="t-remaining">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>النسبة المحققة اليوم</h3>
+                        <div class="value" id="t-daily-pct">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>النسبة المحققة الشهرية</h3>
+                        <div class="value" id="t-monthly-pct">0%</div>
+                    </div>
+                </div>
+
+                <div class="sessions-container">
+                    <div class="session-card">
+                        <h3>Start Session</h3>
+                        <p>تسجيل جلسة بداية (خصم 60 دقيقة من التارجت)</p>
+                        <button class="btn" onclick="recordSession('start', 'Start Session', 60)">تسجيل (1)</button>
+                    </div>
+                    <div class="session-card">
+                        <h3>Train Session</h3>
+                        <p>تسجيل جلسة تمرن (خصم 45 دقيقة من التارجت)</p>
+                        <button class="btn" onclick="recordSession('train', 'Train Session', 45)">تسجيل (1)</button>
+                    </div>
+                    <div class="session-card">
+                        <h3>Track Session</h3>
+                        <p>تسجيل جلسة تعقب (خصم 20 دقيقة من التارجت)</p>
+                        <button class="btn" onclick="recordSession('track', 'Track Session', 20)">تسجيل (1)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="trainer-notes-content" class="hidden">
+                <div class="section-box">
+                    <h3>سجل الملاحظات والتوجيهات الواردة من مدير اللياقة</h3>
+                    <div id="trainer-notes-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="note-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 style="color: var(--primary); margin-bottom: 15px;">إرسال ملاحظة للمدرب: <span id="modal-trainer-name"></span></h3>
+            <div class="form-group">
+                <label>نص التعليق / الملاحظة:</label>
+                <textarea id="modal-note-text" class="form-control" rows="4" placeholder="اكتب الملاحظة هنا واضغط Enter أو إرسال..." onkeydown="handleModalKey(event)"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="submitNote()">إرسال</button>
+                <button class="btn" style="background: #444;" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycby4730PVpmbkGz84h28EMgMIsc1pxzc5Dam1gGCr_FJyjlfgx7jRLaQMpeGD6wwDljf/exec';
+
+        let systemData = {
+            adminPass: 'admin123',
+            users: [],
+            logs: []
+        };
+
+        let currentUser = null;
+        let targetUserIdForNote = null;
+
+        async function fetchCloudData() {
+            try {
+                let resUsers = await fetch(`${API_URL}?sheet=Users`);
+                let usersData = await resUsers.json();
+
+                let resLogs = await fetch(`${API_URL}?sheet=Logs`);
+                let logsData = await resLogs.json();
+
+                if (Array.isArray(usersData)) {
+                    systemData.users = usersData.map(u => ({
+                        id: u.id || '',
+                        name: u.name || '',
+                        role: u.role || '',
+                        pass: u.pass || '',
+                        target: Number(u.target) || 0,
+                        remaining: Number(u.remaining) || 0,
+                        monthlyAchieved: Number(u.monthlyAchieved) || 0,
+                        dailyAchieved: Number(u.dailyAchieved) || 0,
+                        notes: u.notes ? JSON.parse(u.notes) : []
+                    }));
+                }
+
+                if (Array.isArray(logsData)) {
+                    systemData.logs = logsData.map(l => ({
+                        userId: l.userId || '',
+                        userName: l.userName || '',
+                        sessionName: l.sessionName || '',
+                        deduction: Number(l.deduction) || 0,
+                        date: l.date || '',
+                        time: l.time || ''
+                    }));
+                }
+
+                if (systemData.users.length === 0) {
+                    systemData.users = [
+                        { id: 'user1', name: 'أحمد محمود', role: 'مدرب لياقة أول', pass: '1234', target: 1200, remaining: 1200, monthlyAchieved: 0, dailyAchieved: 0, notes: [] },
+                        { id: 'user2', name: 'سارة خالد', role: 'مدربة كروس فيت', pass: '5678', target: 900, remaining: 900, monthlyAchieved: 0, dailyAchieved: 0, notes: [] }
+                    ];
+                }
+
+            } catch (error) {
+                console.error('خطأ أثناء جلب البيانات من السحابة:', error);
+                alert('تعذر الاتصال بقاعدة البيانات السحابية، يرجى التأكد من اتصال الإنترنت.');
+            } finally {
+                document.getElementById('loading-overlay').classList.add('hidden');
+                initLoginSelect();
+            }
+        }
+
+        async function saveUserToCloud(user) {
+            try {
+                let payload = {
+                    id: user.id,
+                    name: user.name,
+                    role: user.role,
+                    pass: user.pass,
+                    target: user.target,
+                    remaining: user.remaining,
+                    monthlyAchieved: user.monthlyAchieved,
+                    dailyAchieved: user.dailyAchieved,
+                    notes: JSON.stringify(user.notes || [])
+                };
+
+                await fetch(`${API_URL}?sheet=Users&method=PUT&id=${user.id}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ data: payload })
+                });
+            } catch (err) {
+                console.error('خطأ في حفظ بيانات المستخدم سحابياً:', err);
+            }
+        }
+
+        async function addUserToCloud(user) {
+            try {
+                let payload = {
+                    id: user.id,
+                    name: user.name,
+                    role: user.role,
+                    pass: user.pass,
+                    target: user.target,
+                    remaining: user.remaining,
+                    monthlyAchieved: user.monthlyAchieved,
+                    dailyAchieved: user.dailyAchieved,
+                    notes: JSON.stringify(user.notes || [])
+                };
+
+                await fetch(`${API_URL}?sheet=Users&method=POST`, {
+                    method: 'POST',
+                    body: JSON.stringify({ data: [payload] })
+                });
+            } catch (err) {
+                console.error('خطأ في إضافة المستخدم سحابياً:', err);
+            }
+        }
+
+        async function deleteUserFromCloud(userId) {
+            try {
+                await fetch(`${API_URL}?sheet=Users&method=DELETE&id=${userId}`, {
+                    method: 'POST'
+                });
+            } catch (err) {
+                console.error('خطأ في حذف المستخدم سحابياً:', err);
+            }
+        }
+
+        async function recordSessionToCloud(logData) {
+            try {
+                await fetch(`${API_URL}?sheet=Logs&method=POST`, {
+                    method: 'POST',
+                    body: JSON.stringify({ data: [logData] })
+                });
+            } catch (err) {
+                console.error('خطأ في ترحيل الجلسة للسحابة:', err);
+            }
+        }
+
+        function initLoginSelect() {
+            const select = document.getElementById('login-user-select');
+            select.innerHTML = '<option value="admin">مدير اللياقة (Fitness Manager - Admin)</option>';
+            systemData.users.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+            });
+        }
+
+        document.getElementById('login-pass').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+
+        function handleLogin() {
+            const selectedVal = document.getElementById('login-user-select').value;
+            const passInput = document.getElementById('login-pass').value;
+
+            if (selectedVal === 'admin') {
+                if (passInput === systemData.adminPass) {
+                    currentUser = { role: 'admin', name: 'مدير اللياقة' };
+                    startAdminSession();
+                } else {
+                    alert('الرقم السري غير صحيح للآدمن!');
+                }
+            } else {
+                const user = systemData.users.find(u => u.id === selectedVal);
+                if (user && user.pass === passInput) {
+                    currentUser = user;
+                    startTrainerSession();
+                } else {
+                    alert('الرقم السري غير صحيح للمستخدم!');
+                }
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('login-pass').value = '';
+            initLoginSelect();
+        }
+
+        function startAdminSession() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = 'مرحباً، مدير اللياقة (Admin)';
+            document.getElementById('app-title').innerText = 'FT-HiiT - لوحة تحكم الإدارة';
+            
+            document.getElementById('admin-view-1').classList.remove('hidden');
+            document.getElementById('admin-view-2').classList.add('hidden');
+            document.getElementById('admin-view-3').classList.add('hidden');
+            document.getElementById('trainer-view').classList.add('hidden');
+            
+            renderAdminStats();
+            initLogFilters();
+        }
+
+        function switchAdminTab(tabNum) {
+            document.getElementById('admin-view-1').classList.add('hidden');
+            document.getElementById('admin-view-2').classList.add('hidden');
+            document.getElementById('admin-view-3').classList.add('hidden');
+
+            const tabBtns = document.querySelectorAll('.admin-tabs .tab-btn');
+            tabBtns.forEach(b => b.classList.remove('active'));
+
+            if (tabNum === 1) {
+                document.getElementById('admin-view-1').classList.remove('hidden');
+                renderAdminStats();
+            } else if (tabNum === 2) {
+                document.getElementById('admin-view-3').classList.remove('hidden');
+                initLogFilters();
+            } else if (tabNum === 3) {
+                document.getElementById('admin-view-2').classList.remove('hidden');
+                renderAdminManage();
+            }
+        }
+
+        function renderAdminStats() {
+            const tbody = document.getElementById('admin-stats-table-body');
+            tbody.innerHTML = '';
+
+            systemData.users.forEach((u) => {
+                let targetHours = (u.target / 60).toFixed(1);
+                let remainingHours = (u.remaining / 60).toFixed(1);
+                let monthlyMinutes = u.monthlyAchieved;
+
+                let dailyPct = u.target > 0 ? Math.min(100, Math.round((u.dailyAchieved / u.target) * 100)) : 0;
+                let monthlyPct = u.target > 0 ? Math.min(100, Math.round((u.monthlyAchieved / u.target) * 100)) : 0;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${u.name}</strong></td>
+                        <td>${u.role}</td>
+                        <td>
+                            <input type="number" step="0.5" class="inline-input" value="${targetHours}" onchange="updateUserTargetHours('${u.id}', this.value)"> س
+                        </td>
+                        <td><span style="color: var(--danger);">${remainingHours} ساعة</span></td>
+                        <td>
+                            <input type="number" class="inline-input" value="${monthlyMinutes}" onchange="updateUserMonthlyAchievedMinutes('${u.id}', this.value)" style="width: 100px;"> دقيقة
+                        </td>
+                        <td>يومي: ${dailyPct}%<br>شهري: ${monthlyPct}%</td>
+                        <td>
+                            <button class="btn-sm btn-primary" onclick="openNoteModal('${u.id}', '${u.name}')">التسجيل والملاحظات</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function updateUserTargetHours(userId, newHours) {
+            const user = systemData.users.find(u => u.id === userId);
+            if (user) {
+                const hoursVal = parseFloat(newHours) || 0;
+                const minutesVal = Math.round(hoursVal * 60);
+                user.target = minutesVal;
+                user.remaining = Math.max(0, minutesVal - user.monthlyAchieved);
+                await saveUserToCloud(user);
+                renderAdminStats();
+            }
+        }
+
+        async function updateUserMonthlyAchievedMinutes(userId, newMinutes) {
+            const user = systemData.users.find(u => u.id === userId);
+            if (user) {
+                const minutesVal = parseInt(newMinutes) || 0;
+                user.monthlyAchieved = minutesVal;
+                user.remaining = Math.max(0, user.target - minutesVal);
+                await saveUserToCloud(user);
+                renderAdminStats();
+            }
+        }
+
+        function openNoteModal(userId, userName) {
+            targetUserIdForNote = userId;
+            document.getElementById('modal-trainer-name').innerText = userName;
+            document.getElementById('modal-note-text').value = '';
+            document.getElementById('note-modal').classList.remove('hidden');
+            document.getElementById('modal-note-text').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('note-modal').classList.add('hidden');
+            targetUserIdForNote = null;
+        }
+
+        function handleModalKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitNote();
+            }
+        }
+
+        async function submitNote() {
+            const noteText = document.getElementById('modal-note-text').value.trim();
+            if (!noteText) {
+                alert('الرجاء كتابة الملاحظة أولاً');
+                return;
+            }
+
+            const user = systemData.users.find(u => u.id === targetUserIdForNote);
+            if (user) {
+                if (!user.notes) user.notes = [];
+                
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ar-EG');
+                const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+                user.notes.push({
+                    text: noteText,
+                    dateTime: `${dateStr} - ${timeStr}`,
+                    unread: true
+                });
+
+                await saveUserToCloud(user);
+                alert('تم تسجيل وإرسال الملاحظة بنجاح إلى المدرب');
+                closeModal();
+            }
+        }
+
+        function startTrainerSession() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `مرحباً، ${currentUser.name}`;
+            document.getElementById('app-title').innerText = `FT-HiiT - ${currentUser.role}`;
+            
+            document.getElementById('admin-view-1').classList.add('hidden');
+            document.getElementById('admin-view-2').classList.add('hidden');
+            document.getElementById('admin-view-3').classList.add('hidden');
+            document.getElementById('trainer-view').classList.remove('hidden');
+
+            switchTrainerTab('dash');
+            checkTrainerNotifications();
+        }
+
+        function checkTrainerNotifications() {
+            const u = systemData.users.find(x => x.id === currentUser.id);
+            if (!u || !u.notes) return;
+
+            const unreadNotes = u.notes.filter(n => n.unread);
+            const banner = document.getElementById('notification-banner');
+            const badge = document.getElementById('notes-badge');
+
+            badge.innerText = unreadNotes.length;
+
+            if (unreadNotes.length > 0) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function switchTrainerTab(tabName) {
+            const dashContent = document.getElementById('trainer-dash-content');
+            const notesContent = document.getElementById('trainer-notes-content');
+            const btnDash = document.getElementById('btn-tab-dash');
+            const btnNotes = document.getElementById('btn-tab-notes');
+
+            if (tabName === 'dash') {
+                dashContent.classList.remove('hidden');
+                notesContent.classList.add('hidden');
+                btnDash.classList.add('active');
+                btnNotes.classList.remove('active');
+                updateTrainerUI();
+            } else {
+                dashContent.classList.add('hidden');
+                notesContent.classList.remove('hidden');
+                btnDash.classList.remove('active');
+                btnNotes.classList.add('active');
+                renderTrainerNotes();
+            }
+        }
+
+        async function goToNotesTab() {
+            const u = systemData.users.find(x => x.id === currentUser.id);
+            if (u && u.notes) {
+                u.notes.forEach(n => n.unread = false);
+                await saveUserToCloud(u);
+            }
+            document.getElementById('notification-banner').classList.add('hidden');
+            switchTrainerTab('notes');
+        }
+
+        async function renderTrainerNotes() {
+            const u = systemData.users.find(x => x.id === currentUser.id);
+            const listDiv = document.getElementById('trainer-notes-list');
+            listDiv.innerHTML = '';
+
+            if (u && u.notes && u.notes.some(n => n.unread)) {
+                u.notes.forEach(n => n.unread = false);
+                await saveUserToCloud(u);
+                checkTrainerNotifications();
+            }
+
+            if (!u || !u.notes || u.notes.length === 0) {
+                listDiv.innerHTML = `<p style="color: var(--text-gray); text-align: center;">لا توجد ملاحظات أو توجيهات سابقة.</p>`;
+                return;
+            }
+
+            [...u.notes].reverse().forEach(note => {
+                listDiv.innerHTML += `
+                    <div class="notification-item">
+                        <p style="font-size: 16px; margin-bottom: 5px;">${note.text}</p>
+                        <div class="time">وقت الإرسال: ${note.dateTime}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateTrainerUI() {
+            const u = systemData.users.find(x => x.id === currentUser.id);
+            if (!u) return;
+
+            let targetHours = (u.target / 60).toFixed(1);
+            let remainingHours = (u.remaining / 60).toFixed(1);
+
+            document.getElementById('t-target').innerText = targetHours + ' ساعة';
+            document.getElementById('t-remaining').innerText = remainingHours + ' ساعة';
+
+            let dailyPct = u.target > 0 ? Math.min(100, Math.round((u.dailyAchieved / u.target) * 100)) : 0;
+            let monthlyPct = u.target > 0 ? Math.min(100, Math.round((u.monthlyAchieved / u.target) * 100)) : 0;
+
+            document.getElementById('t-daily-pct').innerText = dailyPct + '%';
+            document.getElementById('t-monthly-pct').innerText = monthlyPct + '%';
+
+            checkTrainerNotifications();
+        }
+
+        async function recordSession(typeKey, sessionName, deduction) {
+            const u = systemData.users.find(x => x.id === currentUser.id);
+            if (u) {
+                u.remaining = Math.max(0, u.remaining - deduction);
+                u.monthlyAchieved += deduction;
+                u.dailyAchieved += deduction;
+
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                const newLog = {
+                    userId: u.id,
+                    userName: u.name,
+                    sessionName: sessionName,
+                    deduction: deduction,
+                    date: dateStr,
+                    time: timeStr
+                };
+
+                await saveUserToCloud(u);
+                await recordSessionToCloud(newLog);
+                systemData.logs.push(newLog);
+
+                updateTrainerUI();
+                alert(`تم تسجيل الجلسة بنجاح! تم خصم ${deduction} دقيقة من التارجت.`);
+            }
+        }
+
+        function initLogFilters() {
+            const select = document.getElementById('filter-user');
+            select.innerHTML = '<option value="all">جميع المدربين</option>';
+            systemData.users.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+            });
+        }
+
+        async function filterLogs() {
+            try {
+                let resLogs = await fetch(`${API_URL}?sheet=Logs`);
+                let logsData = await resLogs.json();
+                if (Array.isArray(logsData)) {
+                    systemData.logs = logsData.map(l => ({
+                        userId: l.userId || '',
+                        userName: l.userName || '',
+                        sessionName: l.sessionName || '',
+                        deduction: Number(l.deduction) || 0,
+                        date: l.date || '',
+                        time: l.time || ''
+                    }));
+                }
+            } catch (err) {
+                console.log('استخدام السجلات المحلية لتعذر التحديث اللحظي');
+            }
+
+            const selectedUserId = document.getElementById('filter-user').value;
+            const fromDate = document.getElementById('filter-from').value;
+            const toDate = document.getElementById('filter-to').value;
+
+            let filtered = systemData.logs.filter(log => {
+                let matchUser = (selectedUserId === 'all' || log.userId === selectedUserId);
+                let matchDate = true;
+                if (fromDate && log.date < fromDate) matchDate = false;
+                if (toDate && log.date > toDate) matchDate = false;
+                return matchUser && matchDate;
+            });
+
+            const tbody = document.getElementById('admin-logs-table-body');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-gray);">لا توجد سجلات مطابقة لهذه الفترة</td></tr>`;
+                return;
+            }
+
+            filtered.reverse().forEach(log => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${log.userName}</strong></td>
+                        <td>${log.sessionName}</td>
+                        <td><span style="color: var(--primary);">${log.deduction} دقيقة</span></td>
+                        <td>${log.date}</td>
+                        <td><span style="direction: ltr; display: inline-block;">${log.time}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAdminManage() {
+            const tbody = document.getElementById('admin-manage-table-body');
+            tbody.innerHTML = '';
+
+            systemData.users.forEach(u => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.role}</td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="text" id="pass_${u.id}" class="inline-input" placeholder="جديد" style="width:100px;">
+                                <button class="btn-sm btn-success" onclick="changeUserPass('${u.id}')">تحديث</button>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-danger" onclick="deleteUser('${u.id}')">حذف نهائي</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function changeUserPass(userId) {
+            const newPass = document.getElementById(`pass_${userId}`).value;
+            if (!newPass) {
+                alert('الرجاء إدخال الرقم السري الجديد');
+                return;
+            }
+            const user = systemData.users.find(u => u.id === userId);
+            if (user) {
+                user.pass = newPass;
+                await saveUserToCloud(user);
+                alert('تم تحديث الرقم السري بنجاح');
+                document.getElementById(`pass_${userId}`).value = '';
+            }
+        }
+
+        function updateAdminPassword() {
+            const newPass = document.getElementById('new-admin-pass').value;
+            if (!newPass) {
+                alert('الرجاء إدخال الرقم السري الجديد للآدمن');
+                return;
+            }
+            systemData.adminPass = newPass;
+            alert('تم تحديث رقم سري الآدمن بنجاح');
+            document.getElementById('new-admin-pass').value = '';
+        }
+
+        async function addNewUser() {
+            const name = document.getElementById('new-user-name').value;
+            const role = document.getElementById('new-user-role').value;
+            const pass = document.getElementById('new-user-pass').value;
+            const targetHours = parseFloat(document.getElementById('new-user-target-hours').value) || 20;
+
+            if (!name || !pass) {
+                alert('الرجاء تعبئة اسم المدرب والرقم السري على الأقل');
+                return;
+            }
+
+            const targetMinutes = Math.round(targetHours * 60);
+
+            const newUser = {
+                id: 'user_' + Date.now(),
+                name: name,
+                role: role || 'مدرب',
+                pass: pass,
+                target: targetMinutes,
+                remaining: targetMinutes,
+                monthlyAchieved: 0,
+                dailyAchieved: 0,
+                notes: []
+            };
+
+            systemData.users.push(newUser);
+            await addUserToCloud(newUser);
+
+            alert('تم إضافة المدرب بنجاح إلى السحابة');
+            
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-role').value = '';
+            document.getElementById('new-user-pass').value = '';
+            document.getElementById('new-user-target-hours').value = '';
+            
+            renderAdminManage();
+            initLoginSelect();
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('هل أنت متأكد من حذف هذا المستخدم نهائياً؟')) {
+                systemData.users = systemData.users.filter(u => u.id !== userId);
+                await deleteUserFromCloud(userId);
+                renderAdminManage();
+                initLoginSelect();
+            }
+        }
+
+        window.onload = function() {
+            fetchCloudData();
+        };
+    </script>
+</body>
+</html>
